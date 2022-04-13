@@ -1,17 +1,19 @@
-export class RecipeView {
+import icons from '../../img/icons.svg';
+
+class RecipeView {
   #parentElement = document.querySelector('.recipe');
   #data;
-  constructor() {}
-
   render(data) {
     this.#data = data;
     if (!data) return;
-
     this.#generatorHtml(this.#data);
+    this.#data.ingredients.forEach(element => {
+      this.#reseptIngridient(element);
+    });
   }
 
   #generatorHtml(obj) {
-    recipeContainer.innerHTML = '';
+    this.#parentElement.innerHTML = '';
     let html = `
     <figure class="recipe__fig">
         <img src="${obj.image_url}" alt="Tomato" class="recipe__img" />
@@ -88,4 +90,23 @@ export class RecipeView {
       </div>`;
     this.#parentElement.insertAdjacentHTML('afterbegin', html);
   }
+
+  #reseptIngridient(obj) {
+    let html = `
+    <li class="recipe__ingredient">
+        <svg class="recipe__icon">
+          <use href="${icons}#icon-check"></use>
+        </svg>
+        <div class="recipe__quantity">${obj.quantity ? obj.quantity : ''}</div>
+        <div class="recipe__description">
+          <span class="recipe__unit">${obj.unit}</span>
+          ${obj.description}
+        </div>
+      </li>`;
+    document
+      .querySelector('.recipe__ingredient-list')
+      .insertAdjacentHTML('afterbegin', html);
+  }
 }
+
+export default new RecipeView();
