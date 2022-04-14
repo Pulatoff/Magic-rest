@@ -1,7 +1,6 @@
 import * as model from './model';
 import recipeView from './views/recipeView';
 
-console.log(recipeView);
 const timeout = function (s) {
   return new Promise(function (_, reject) {
     setTimeout(function () {
@@ -11,14 +10,20 @@ const timeout = function (s) {
 };
 
 async function renderRight() {
-  const id = window.location.hash.slice(1);
-  await model.recipeShow(id);
-  recipeView.render(model.state.recipe);
+  try {
+    const id = window.location.hash.slice(1);
+    recipeView.spinner();
+    await Promise.race([model.recipeShow(id), timeout(5)]);
+    recipeView.render(model.state.recipe);
+  } catch (error) {
+    alert(error);
+  }
 }
 
 ['hashchange', 'load'].map(val => {
   window.addEventListener(val, renderRight);
 });
+
 // https://forkify-api.herokuapp.com/v2
 
 ///////////////////////////////////////

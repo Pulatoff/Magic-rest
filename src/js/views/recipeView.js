@@ -3,17 +3,22 @@ import icons from '../../img/icons.svg';
 class RecipeView {
   #parentElement = document.querySelector('.recipe');
   #data;
+
   render(data) {
     this.#data = data;
     if (!data) return;
+    this.#clearHtml();
     this.#generatorHtml(this.#data);
     this.#data.ingredients.forEach(element => {
       this.#reseptIngridient(element);
     });
   }
 
-  #generatorHtml(obj) {
+  #clearHtml() {
     this.#parentElement.innerHTML = '';
+  }
+
+  #generatorHtml(obj) {
     let html = `
     <figure class="recipe__fig">
         <img src="${obj.image_url}" alt="Tomato" class="recipe__img" />
@@ -106,6 +111,15 @@ class RecipeView {
     document
       .querySelector('.recipe__ingredient-list')
       .insertAdjacentHTML('afterbegin', html);
+  }
+  spinner() {
+    let html = `<div class="spinner">
+    <svg>
+      <use href="${icons}#icon-loader"></use>
+    </svg>
+  </div>`;
+    this.#clearHtml();
+    this.#parentElement.insertAdjacentHTML('afterbegin', html);
   }
 }
 

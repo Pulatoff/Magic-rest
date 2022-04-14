@@ -518,7 +518,6 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 var _model = require("./model");
 var _recipeView = require("./views/recipeView");
 var _recipeViewDefault = parcelHelpers.interopDefault(_recipeView);
-console.log(_recipeViewDefault.default);
 const timeout = function(s) {
     return new Promise(function(_, reject) {
         setTimeout(function() {
@@ -527,9 +526,17 @@ const timeout = function(s) {
     });
 };
 async function renderRight() {
-    const id = window.location.hash.slice(1);
-    await _model.recipeShow(id);
-    _recipeViewDefault.default.render(_model.state.recipe);
+    try {
+        const id = window.location.hash.slice(1);
+        _recipeViewDefault.default.spinner();
+        await Promise.race([
+            _model.recipeShow(id),
+            timeout(5)
+        ]);
+        _recipeViewDefault.default.render(_model.state.recipe);
+    } catch (error) {
+        alert(error);
+    }
 }
 [
     'hashchange',
@@ -577,17 +584,22 @@ parcelHelpers.export(exports, "state", ()=>state
 parcelHelpers.export(exports, "recipeShow", ()=>recipeShow
 );
 var _regeneratorRuntime = require("regenerator-runtime");
+var _config = require("./config");
+var _helper = require("./helper");
 const state = {
     recipe: {}
 };
 async function recipeShow(id) {
-    let dataJson = await fetch(`https://forkify-api.herokuapp.com/api/v2/recipes/${id}`);
-    let data = await dataJson.json();
-    let recipe = data.data.recipe;
-    state.recipe = recipe;
+    try {
+        let data = await _helper.getJSON(_config.API_URL + id);
+        let recipe = data.data.recipe;
+        state.recipe = recipe;
+    } catch (error) {
+        alert(error);
+    }
 }
 
-},{"regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dXNgZ":[function(require,module,exports) {
+},{"regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./config":"k5Hzs","./helper":"lVRAz"}],"dXNgZ":[function(require,module,exports) {
 /**
  * Copyright (c) 2014-present, Facebook, Inc.
  *
@@ -1153,7 +1165,26 @@ try {
     else Function("r", "regeneratorRuntime = r")(runtime);
 }
 
-},{}],"l60JC":[function(require,module,exports) {
+},{}],"k5Hzs":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "API_URL", ()=>API_URL
+);
+const API_URL = 'https://forkify-api.herokuapp.com/api/v2/recipes/';
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lVRAz":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "getJSON", ()=>getJSON
+);
+var _regeneratorRuntime = require("regenerator-runtime");
+const getJSON = async function(url) {
+    const data = await fetch(url);
+    const dataJson = await data.json();
+    return dataJson;
+};
+
+},{"regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"l60JC":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _iconsSvg = require("../../img/icons.svg");
@@ -1164,13 +1195,16 @@ class RecipeView {
     render(data) {
         this.#data = data;
         if (!data) return;
+        this.#clearHtml();
         this.#generatorHtml(this.#data);
         this.#data.ingredients.forEach((element)=>{
             this.#reseptIngridient(element);
         });
     }
-     #generatorHtml(obj) {
+     #clearHtml() {
         this.#parentElement.innerHTML = '';
+    }
+     #generatorHtml(obj) {
         let html = `
     <figure class="recipe__fig">
         <img src="${obj.image_url}" alt="Tomato" class="recipe__img" />
@@ -1260,6 +1294,15 @@ class RecipeView {
         </div>
       </li>`;
         document.querySelector('.recipe__ingredient-list').insertAdjacentHTML('afterbegin', html);
+    }
+    spinner() {
+        let html = `<div class="spinner">
+    <svg>
+      <use href="${_iconsSvgDefault.default}#icon-loader"></use>
+    </svg>
+  </div>`;
+        this.#clearHtml();
+        this.#parentElement.insertAdjacentHTML('afterbegin', html);
     }
 }
 exports.default = new RecipeView();
