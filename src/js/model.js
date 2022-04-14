@@ -11,6 +11,6 @@ export async function recipeShow(id) {
     let recipe = data.data.recipe;
     state.recipe = recipe;
   } catch (error) {
-    alert(error);
+    throw error;
   }
 }

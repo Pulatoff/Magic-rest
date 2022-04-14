@@ -13,17 +13,15 @@ async function renderRight() {
   try {
     const id = window.location.hash.slice(1);
     recipeView.spinner();
-    await Promise.race([model.recipeShow(id), timeout(5)]);
+    await model.recipeShow(id);
+    // await Promise.race([ timeout(5)]);
     recipeView.render(model.state.recipe);
   } catch (error) {
-    alert(error);
+    recipeView.errorMesage(error);
   }
 }
 
-['hashchange', 'load'].map(val => {
-  window.addEventListener(val, renderRight);
-});
-
+recipeView.addHandleEvent(renderRight);
 // https://forkify-api.herokuapp.com/v2
 
 ///////////////////////////////////////

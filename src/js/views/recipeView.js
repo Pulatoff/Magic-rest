@@ -112,11 +112,30 @@ class RecipeView {
       .querySelector('.recipe__ingredient-list')
       .insertAdjacentHTML('afterbegin', html);
   }
+  addHandleEvent(handle) {
+    ['hashchange', 'load'].map(val => {
+      window.addEventListener(val, handle);
+    });
+  }
+
   spinner() {
     let html = `<div class="spinner">
     <svg>
       <use href="${icons}#icon-loader"></use>
     </svg>
+  </div>`;
+    this.#clearHtml();
+    this.#parentElement.insertAdjacentHTML('afterbegin', html);
+  }
+
+  errorMesage(eror) {
+    const html = ` <div class="error">
+    <div>
+      <svg>
+        <use href="${eror}#icon-alert-triangle"></use>
+      </svg>
+    </div>
+    <p>No recipes found for your query. Please try again!</p>
   </div>`;
     this.#clearHtml();
     this.#parentElement.insertAdjacentHTML('afterbegin', html);
