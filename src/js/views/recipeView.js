@@ -1,24 +1,11 @@
 import icons from '../../img/icons.svg';
+import View from './View';
 
-class RecipeView {
-  #parentElement = document.querySelector('.recipe');
-  #data;
+class RecipeView extends View {
+  _errorMessage = 'No recipes found for your query. Please try again!';
+  _parentElement = document.querySelector('.recipe');
 
-  render(data) {
-    this.#data = data;
-    if (!data) return;
-    this.#clearHtml();
-    this.#generatorHtml(this.#data);
-    this.#data.ingredients.forEach(element => {
-      this.#reseptIngridient(element);
-    });
-  }
-
-  #clearHtml() {
-    this.#parentElement.innerHTML = '';
-  }
-
-  #generatorHtml(obj) {
+  _generatorHtml(obj) {
     let html = `
     <figure class="recipe__fig">
         <img src="${obj.image_url}" alt="Tomato" class="recipe__img" />
@@ -93,10 +80,10 @@ class RecipeView {
           </svg>
         </a>
       </div>`;
-    this.#parentElement.insertAdjacentHTML('afterbegin', html);
+    this._parentElement.insertAdjacentHTML('afterbegin', html);
   }
 
-  #reseptIngridient(obj) {
+  _reseptIngridient(obj) {
     let html = `
     <li class="recipe__ingredient">
         <svg class="recipe__icon">
@@ -116,29 +103,6 @@ class RecipeView {
     ['hashchange', 'load'].map(val => {
       window.addEventListener(val, handle);
     });
-  }
-
-  spinner() {
-    let html = `<div class="spinner">
-    <svg>
-      <use href="${icons}#icon-loader"></use>
-    </svg>
-  </div>`;
-    this.#clearHtml();
-    this.#parentElement.insertAdjacentHTML('afterbegin', html);
-  }
-
-  errorMesage(eror) {
-    const html = ` <div class="error">
-    <div>
-      <svg>
-        <use href="${eror}#icon-alert-triangle"></use>
-      </svg>
-    </div>
-    <p>No recipes found for your query. Please try again!</p>
-  </div>`;
-    this.#clearHtml();
-    this.#parentElement.insertAdjacentHTML('afterbegin', html);
   }
 }
 
