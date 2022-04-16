@@ -20,6 +20,7 @@ const timeout = function (s) {
 async function renderRight() {
   try {
     const id = window.location.hash.slice(1);
+    if (!id) return;
     recipeView.spinner();
     await model.recipeShow(id);
     // await Promise.race([ timeout(5)]);

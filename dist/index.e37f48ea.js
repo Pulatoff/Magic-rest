@@ -538,6 +538,7 @@ const timeout = function(s) {
 async function renderRight() {
     try {
         const id = window.location.hash.slice(1);
+        if (!id) return;
         _recipeViewDefault.default.spinner();
         await _model.recipeShow(id);
         // await Promise.race([ timeout(5)]);
