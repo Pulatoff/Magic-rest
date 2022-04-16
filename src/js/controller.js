@@ -5,9 +5,9 @@ import searchView from './views/search';
 import resultsView from './views/resultsView';
 import pagination from './views/pagination';
 
-if (module.hot) {
-  module.hot.accept();
-}
+// if (module.hot) {
+//   module.hot.accept();
+// }
 
 const timeout = function (s) {
   return new Promise(function (_, reject) {
@@ -42,6 +42,12 @@ async function searchControler() {
   }
 }
 
+function paginationControler(goto) {
+  resultsView.render(model.getSearchResultsPage(goto));
+  pagination._generatorHtml(model.state.search);
+}
+
+pagination._addHandleClick(paginationControler);
 recipeView.addHandleEvent(renderRight);
 searchView.addHandleEvent(searchControler);
 // https://forkify-api.herokuapp.com/v2

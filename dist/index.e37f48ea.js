@@ -525,7 +525,9 @@ var _resultsView = require("./views/resultsView");
 var _resultsViewDefault = parcelHelpers.interopDefault(_resultsView);
 var _pagination = require("./views/pagination");
 var _paginationDefault = parcelHelpers.interopDefault(_pagination);
-if (module.hot) module.hot.accept();
+// if (module.hot) {
+//   module.hot.accept();
+// }
 const timeout = function(s) {
     return new Promise(function(_, reject) {
         setTimeout(function() {
@@ -556,62 +558,16 @@ async function searchControler() {
         _resultsViewDefault.default.errorMesage(error);
     }
 }
+function paginationControler(goto) {
+    _resultsViewDefault.default.render(_model.getSearchResultsPage(goto));
+    _paginationDefault.default._generatorHtml(_model.state.search);
+}
+_paginationDefault.default._addHandleClick(paginationControler);
 _recipeViewDefault.default.addHandleEvent(renderRight);
 _searchDefault.default.addHandleEvent(searchControler); // https://forkify-api.herokuapp.com/v2
  ///////////////////////////////////////
 
-},{"./model":"Y4A21","./views/recipeView":"l60JC","./views/search":"kuQE5","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","regenerator-runtime":"dXNgZ","./views/resultsView":"cSbZE","./views/pagination":"lOFRU"}],"Y4A21":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "state", ()=>state
-);
-parcelHelpers.export(exports, "recipeShow", ()=>recipeShow
-);
-parcelHelpers.export(exports, "searchModel", ()=>searchModel
-);
-parcelHelpers.export(exports, "getSearchResultsPage", ()=>getSearchResultsPage
-);
-var _lodashEs = require("lodash-es");
-var _regeneratorRuntime = require("regenerator-runtime");
-var _config = require("./config");
-var _helper = require("./helper");
-const state = {
-    recipe: {},
-    search: {
-        query: '',
-        results: [],
-        page: 1,
-        resultsPerPage: _config.PAGECOUNT
-    }
-};
-async function recipeShow(id) {
-    try {
-        let data = await _helper.getJSON(_config.API_URL + id);
-        let recipe = data.data.recipe;
-        state.recipe = recipe;
-    } catch (error) {
-        throw error;
-    }
-}
-async function searchModel(query) {
-    try {
-        state.search.query = query;
-        let data = await _helper.getJSON(`${_config.API_URL}?search=${query}`);
-        state.search.results = data.data.recipes.map((element)=>{
-            return element;
-        });
-    } catch (error) {
-        throw error;
-    }
-}
-function getSearchResultsPage(page = state.search.page) {
-    state.search.page = page;
-    const start = (page - 1) * state.search.resultsPerPage;
-    const end = page * state.search.resultsPerPage;
-    return state.search.results.slice(start, end);
-}
-
-},{"regenerator-runtime":"dXNgZ","./config":"k5Hzs","./helper":"lVRAz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","lodash-es":"bXNwz"}],"dXNgZ":[function(require,module,exports) {
+},{"regenerator-runtime":"dXNgZ","./model":"Y4A21","./views/recipeView":"l60JC","./views/search":"kuQE5","./views/resultsView":"cSbZE","./views/pagination":"lOFRU","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dXNgZ":[function(require,module,exports) {
 /**
  * Copyright (c) 2014-present, Facebook, Inc.
  *
@@ -1177,74 +1133,58 @@ try {
     else Function("r", "regeneratorRuntime = r")(runtime);
 }
 
-},{}],"k5Hzs":[function(require,module,exports) {
+},{}],"Y4A21":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "API_URL", ()=>API_URL
+parcelHelpers.export(exports, "state", ()=>state
 );
-parcelHelpers.export(exports, "PAGECOUNT", ()=>PAGECOUNT
+parcelHelpers.export(exports, "recipeShow", ()=>recipeShow
 );
-const API_URL = 'https://forkify-api.herokuapp.com/api/v2/recipes/';
-const PAGECOUNT = 10;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
-exports.interopDefault = function(a) {
-    return a && a.__esModule ? a : {
-        default: a
-    };
-};
-exports.defineInteropFlag = function(a) {
-    Object.defineProperty(a, '__esModule', {
-        value: true
-    });
-};
-exports.exportAll = function(source, dest) {
-    Object.keys(source).forEach(function(key) {
-        if (key === 'default' || key === '__esModule' || dest.hasOwnProperty(key)) return;
-        Object.defineProperty(dest, key, {
-            enumerable: true,
-            get: function() {
-                return source[key];
-            }
-        });
-    });
-    return dest;
-};
-exports.export = function(dest, destName, get) {
-    Object.defineProperty(dest, destName, {
-        enumerable: true,
-        get: get
-    });
-};
-
-},{}],"lVRAz":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "getJSON", ()=>getJSON
+parcelHelpers.export(exports, "searchModel", ()=>searchModel
 );
+parcelHelpers.export(exports, "getSearchResultsPage", ()=>getSearchResultsPage
+);
+var _lodashEs = require("lodash-es");
 var _regeneratorRuntime = require("regenerator-runtime");
-const timeout = function(s) {
-    return new Promise(function(_, reject) {
-        setTimeout(function() {
-            reject(new Error(`Request took too long! Timeout after ${s} second`));
-        }, s * 1000);
-    });
+var _config = require("./config");
+var _helper = require("./helper");
+const state = {
+    recipe: {},
+    search: {
+        query: '',
+        results: [],
+        page: 1,
+        resultsPerPage: _config.PAGECOUNT
+    }
 };
-const getJSON = async function(url) {
+async function recipeShow(id) {
     try {
-        let data = await Promise.race([
-            fetch(url),
-            timeout(5)
-        ]);
-        // const data = await ;
-        const dataJson = await data.json();
-        return dataJson;
+        let data = await _helper.getJSON(_config.API_URL + id);
+        let recipe = data.data.recipe;
+        state.recipe = recipe;
     } catch (error) {
         throw error;
     }
-};
+}
+async function searchModel(query) {
+    try {
+        state.search.query = query;
+        let data = await _helper.getJSON(`${_config.API_URL}?search=${query}`);
+        state.search.results = data.data.recipes.map((element)=>{
+            return element;
+        });
+    } catch (error) {
+        throw error;
+    }
+}
+function getSearchResultsPage(page = state.search.page) {
+    state.search.page = page;
+    const start = (page - 1) * state.search.resultsPerPage;
+    const end = page * state.search.resultsPerPage;
+    return state.search.results.slice(start, end);
+}
 
-},{"regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bXNwz":[function(require,module,exports) {
+},{"lodash-es":"bXNwz","regenerator-runtime":"dXNgZ","./config":"k5Hzs","./helper":"lVRAz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bXNwz":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 /**
@@ -2805,7 +2745,37 @@ var global = arguments[3];
 /** Detect free variable `global` from Node.js. */ var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
 exports.default = freeGlobal;
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ijXom":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
+exports.interopDefault = function(a) {
+    return a && a.__esModule ? a : {
+        default: a
+    };
+};
+exports.defineInteropFlag = function(a) {
+    Object.defineProperty(a, '__esModule', {
+        value: true
+    });
+};
+exports.exportAll = function(source, dest) {
+    Object.keys(source).forEach(function(key) {
+        if (key === 'default' || key === '__esModule' || dest.hasOwnProperty(key)) return;
+        Object.defineProperty(dest, key, {
+            enumerable: true,
+            get: function() {
+                return source[key];
+            }
+        });
+    });
+    return dest;
+};
+exports.export = function(dest, destName, get) {
+    Object.defineProperty(dest, destName, {
+        enumerable: true,
+        get: get
+    });
+};
+
+},{}],"ijXom":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _symbolJs = require("./_Symbol.js");
@@ -4323,7 +4293,44 @@ var _baseToStringJsDefault = parcelHelpers.interopDefault(_baseToStringJs);
 }
 exports.default = toString;
 
-},{"./_baseToString.js":"fQ5ds","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"l60JC":[function(require,module,exports) {
+},{"./_baseToString.js":"fQ5ds","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k5Hzs":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "API_URL", ()=>API_URL
+);
+parcelHelpers.export(exports, "PAGECOUNT", ()=>PAGECOUNT
+);
+const API_URL = 'https://forkify-api.herokuapp.com/api/v2/recipes/';
+const PAGECOUNT = 10;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lVRAz":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "getJSON", ()=>getJSON
+);
+var _regeneratorRuntime = require("regenerator-runtime");
+const timeout = function(s) {
+    return new Promise(function(_, reject) {
+        setTimeout(function() {
+            reject(new Error(`Request took too long! Timeout after ${s} second`));
+        }, s * 1000);
+    });
+};
+const getJSON = async function(url) {
+    try {
+        let data = await Promise.race([
+            fetch(url),
+            timeout(5)
+        ]);
+        // const data = await ;
+        const dataJson = await data.json();
+        return dataJson;
+    } catch (error) {
+        throw error;
+    }
+};
+
+},{"regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"l60JC":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _iconsSvg = require("../../img/icons.svg");
@@ -4435,7 +4442,7 @@ class RecipeView extends _viewDefault.default {
 }
 exports.default = new RecipeView();
 
-},{"../../img/icons.svg":"cMpiy","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./View":"5cUXS"}],"cMpiy":[function(require,module,exports) {
+},{"../../img/icons.svg":"cMpiy","./View":"5cUXS","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"cMpiy":[function(require,module,exports) {
 module.exports = require('./helpers/bundle-url').getBundleURL('hWUTQ') + "icons.21bad73c.svg" + "?" + Date.now();
 
 },{"./helpers/bundle-url":"lgJ39"}],"lgJ39":[function(require,module,exports) {
@@ -4517,7 +4524,7 @@ class View {
 }
 exports.default = View;
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../../img/icons.svg":"cMpiy"}],"kuQE5":[function(require,module,exports) {
+},{"../../img/icons.svg":"cMpiy","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kuQE5":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 class SearchView {
@@ -4583,9 +4590,56 @@ var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 var _lodashEs = require("lodash-es");
 class Pagination extends _viewDefault.default {
     _parentElement = document.querySelector('.pagination');
+    _addHandleClick(handler) {
+        this._parentElement.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn--inline');
+            if (!btn) return;
+            const goToPage = +btn.dataset.goto;
+            handler(goToPage);
+        });
+    }
     _generatorHtml(data) {
-        const pageSum = data.results.length / data.resultsPerPage;
-        console.log(pageSum);
+        const pageSum = Math.ceil(data.results.length / data.resultsPerPage);
+        if (data.page === 1 && pageSum > 1) {
+            this._clearHtml();
+            let html = `
+      <button data-goto="${data.page + 1}" class="btn--inline pagination__btn--next">
+          <span>Page ${data.page + 1}</span>
+          <svg class="search__icon">
+            <use href="${_iconsSvgDefault.default}#icon-arrow-right"></use>
+          </svg>
+      </button>
+      `;
+            this._parentElement.insertAdjacentHTML('afterbegin', html);
+        } else if (data.page === pageSum && pageSum > 1) {
+            this._clearHtml();
+            let html = `
+      <button data-goto="${data.page - 1}" class="btn--inline pagination__btn--prev">
+      <svg class="search__icon">
+        <use href="${_iconsSvgDefault.default}#icon-arrow-left"></use>
+      </svg>
+      <span>Page ${data.page - 1}</span>
+    </button>
+      `;
+            this._parentElement.insertAdjacentHTML('afterbegin', html);
+        } else if (data.page < pageSum && pageSum > 1) {
+            this._clearHtml();
+            let html = `
+      <button data-goto="${data.page - 1}" class="btn--inline pagination__btn--prev">
+      <svg class="search__icon">
+        <use href="${_iconsSvgDefault.default}#icon-arrow-left"></use>
+      </svg>
+      <span>Page ${data.page - 1}</span>
+    </button>
+    <button data-goto="${data.page + 1}" class="btn--inline pagination__btn--next">
+          <span>Page ${data.page + 1}</span>
+          <svg class="search__icon">
+            <use href="${_iconsSvgDefault.default}#icon-arrow-right"></use>
+          </svg>
+      </button>
+      `;
+            this._parentElement.insertAdjacentHTML('afterbegin', html);
+        } else return console.log(`bir`);
     }
 }
 exports.default = new Pagination();
