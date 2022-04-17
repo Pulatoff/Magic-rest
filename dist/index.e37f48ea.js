@@ -528,20 +528,12 @@ var _paginationDefault = parcelHelpers.interopDefault(_pagination);
 // if (module.hot) {
 //   module.hot.accept();
 // }
-const timeout = function(s) {
-    return new Promise(function(_, reject) {
-        setTimeout(function() {
-            reject(new Error(`Request took too long! Timeout after ${s} second`));
-        }, s * 1000);
-    });
-};
 async function renderRight() {
     try {
         const id = window.location.hash.slice(1);
         if (!id) return;
         _recipeViewDefault.default.spinner();
         await _model.recipeShow(id);
-        // await Promise.race([ timeout(5)]);
         _recipeViewDefault.default.render(_model.state.recipe);
     } catch (error) {
         _recipeViewDefault.default.errorMesage(error);
@@ -563,9 +555,14 @@ function paginationControler(goto) {
     _resultsViewDefault.default.render(_model.getSearchResultsPage(goto));
     _paginationDefault.default._generatorHtml(_model.state.search);
 }
+function servingsControler(num) {
+    _model.servings(num);
+    _recipeViewDefault.default.render(_model.state.recipe);
+}
 _paginationDefault.default._addHandleClick(paginationControler);
 _recipeViewDefault.default.addHandleEvent(renderRight);
-_searchDefault.default.addHandleEvent(searchControler); // https://forkify-api.herokuapp.com/v2
+_searchDefault.default.addHandleEvent(searchControler);
+_recipeViewDefault.default.addHandleEventServings(servingsControler); // https://forkify-api.herokuapp.com/v2
  ///////////////////////////////////////
 
 },{"regenerator-runtime":"dXNgZ","./model":"Y4A21","./views/recipeView":"l60JC","./views/search":"kuQE5","./views/resultsView":"cSbZE","./views/pagination":"lOFRU","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dXNgZ":[function(require,module,exports) {
@@ -1145,6 +1142,8 @@ parcelHelpers.export(exports, "searchModel", ()=>searchModel
 );
 parcelHelpers.export(exports, "getSearchResultsPage", ()=>getSearchResultsPage
 );
+parcelHelpers.export(exports, "servings", ()=>servings
+);
 var _lodashEs = require("lodash-es");
 var _regeneratorRuntime = require("regenerator-runtime");
 var _config = require("./config");
@@ -1183,6 +1182,12 @@ function getSearchResultsPage(page = state.search.page) {
     const start = (page - 1) * state.search.resultsPerPage;
     const end = page * state.search.resultsPerPage;
     return state.search.results.slice(start, end);
+}
+function servings(peopleNumber) {
+    state.recipe.ingredients.map((val)=>{
+        val.quantity = val.quantity / state.recipe.servings * peopleNumber;
+    });
+    state.recipe.servings = peopleNumber;
 }
 
 },{"lodash-es":"bXNwz","regenerator-runtime":"dXNgZ","./config":"k5Hzs","./helper":"lVRAz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bXNwz":[function(require,module,exports) {
@@ -4366,12 +4371,12 @@ class RecipeView extends _viewDefault.default {
           <span class="recipe__info-text">servings</span>
       
           <div class="recipe__info-buttons">
-            <button class="btn--tiny btn--increase-servings">
+            <button class="btn--tiny btn--increase-servings" id="${obj.servings - 1}">
               <svg>
                 <use href="${_iconsSvgDefault.default}#icon-minus-circle"></use>
               </svg>
             </button>
-            <button class="btn--tiny btn--increase-servings">
+            <button class="btn--tiny btn--increase-servings" id="${obj.servings + 1}">
               <svg>
                 <use href="${_iconsSvgDefault.default}#icon-plus-circle"></use>
               </svg>
@@ -4438,6 +4443,15 @@ class RecipeView extends _viewDefault.default {
             'load'
         ].map((val)=>{
             window.addEventListener(val, handle);
+        });
+    }
+    addHandleEventServings(handle) {
+        this._parentElement.addEventListener('click', (e)=>{
+            const btn = e.target.closest('.btn--tiny');
+            if (!btn) return;
+            const servNumber = +btn.id;
+            console.log(servNumber);
+            handle(servNumber);
         });
     }
 }

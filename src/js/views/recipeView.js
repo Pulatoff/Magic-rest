@@ -19,23 +19,31 @@ class RecipeView extends View {
           <svg class="recipe__info-icon">
             <use href="${icons}#icon-clock"></use>
           </svg>
-          <span class="recipe__info-data recipe__info-data--minutes">${obj.cooking_time}</span>
+          <span class="recipe__info-data recipe__info-data--minutes">${
+            obj.cooking_time
+          }</span>
           <span class="recipe__info-text">minutes</span>
         </div>
         <div class="recipe__info">
           <svg class="recipe__info-icon">
             <use href="${icons}#icon-users"></use>
           </svg>
-          <span class="recipe__info-data recipe__info-data--people">${obj.servings}</span>
+          <span class="recipe__info-data recipe__info-data--people">${
+            obj.servings
+          }</span>
           <span class="recipe__info-text">servings</span>
       
           <div class="recipe__info-buttons">
-            <button class="btn--tiny btn--increase-servings">
+            <button class="btn--tiny btn--increase-servings" id="${
+              obj.servings - 1
+            }">
               <svg>
                 <use href="${icons}#icon-minus-circle"></use>
               </svg>
             </button>
-            <button class="btn--tiny btn--increase-servings">
+            <button class="btn--tiny btn--increase-servings" id="${
+              obj.servings + 1
+            }">
               <svg>
                 <use href="${icons}#icon-plus-circle"></use>
               </svg>
@@ -66,7 +74,9 @@ class RecipeView extends View {
         <h2 class="heading--2">How to cook it</h2>
         <p class="recipe__directions-text">
           This recipe was carefully designed and tested by
-          <span class="recipe__publisher">${obj.publisher}</span>. Please check out
+          <span class="recipe__publisher">${
+            obj.publisher
+          }</span>. Please check out
           directions at their website.
         </p>
         <a
@@ -102,6 +112,15 @@ class RecipeView extends View {
   addHandleEvent(handle) {
     ['hashchange', 'load'].map(val => {
       window.addEventListener(val, handle);
+    });
+  }
+  addHandleEventServings(handle) {
+    this._parentElement.addEventListener('click', e => {
+      const btn = e.target.closest('.btn--tiny');
+      if (!btn) return;
+      const servNumber = +btn.id;
+      console.log(servNumber);
+      handle(servNumber);
     });
   }
 }

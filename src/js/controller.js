@@ -9,21 +9,12 @@ import pagination from './views/pagination';
 //   module.hot.accept();
 // }
 
-const timeout = function (s) {
-  return new Promise(function (_, reject) {
-    setTimeout(function () {
-      reject(new Error(`Request took too long! Timeout after ${s} second`));
-    }, s * 1000);
-  });
-};
-
 async function renderRight() {
   try {
     const id = window.location.hash.slice(1);
     if (!id) return;
     recipeView.spinner();
     await model.recipeShow(id);
-    // await Promise.race([ timeout(5)]);
     recipeView.render(model.state.recipe);
   } catch (error) {
     recipeView.errorMesage(error);
@@ -48,9 +39,15 @@ function paginationControler(goto) {
   pagination._generatorHtml(model.state.search);
 }
 
+function servingsControler(num) {
+  model.servings(num);
+  recipeView.render(model.state.recipe);
+}
+
 pagination._addHandleClick(paginationControler);
 recipeView.addHandleEvent(renderRight);
 searchView.addHandleEvent(searchControler);
+recipeView.addHandleEventServings(servingsControler);
 // https://forkify-api.herokuapp.com/v2
 
 ///////////////////////////////////////

@@ -41,3 +41,10 @@ export function getSearchResultsPage(page = state.search.page) {
   const end = page * state.search.resultsPerPage;
   return state.search.results.slice(start, end);
 }
+
+export function servings(peopleNumber) {
+  state.recipe.ingredients.map(val => {
+    val.quantity = (val.quantity / state.recipe.servings) * peopleNumber;
+  });
+  state.recipe.servings = peopleNumber;
+}
