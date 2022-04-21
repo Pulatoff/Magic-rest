@@ -10,6 +10,7 @@ export const state = {
     page: 1,
     resultsPerPage: PAGECOUNT,
   },
+  bookmark: [],
 };
 
 export async function recipeShow(id) {
@@ -17,6 +18,9 @@ export async function recipeShow(id) {
     let data = await getJSON(API_URL + id);
     let recipe = data.data.recipe;
     state.recipe = recipe;
+    if (state.bookmark.some(val => val.id === state.recipe.id)) {
+      state.recipe.bookmarked = true;
+    }
   } catch (error) {
     throw error;
   }
@@ -47,4 +51,27 @@ export function servings(peopleNumber) {
     val.quantity = (val.quantity / state.recipe.servings) * peopleNumber;
   });
   state.recipe.servings = peopleNumber;
+}
+
+export function bookmarks(data) {
+  state.bookmark.push(data);
+  state.recipe.bookmarked = true;
+  saveLocalStorage();
+}
+
+export function deleteBookmark(id) {
+  const index = state.bookmark.findIndex(val => val.id === id);
+  state.recipe.bookmarked = false;
+  state.bookmark.splice(index, 1);
+  saveLocalStorage();
+}
+
+function saveLocalStorage() {
+  localStorage.setItem('bookmarks', JSON.stringify(state.bookmark));
+}
+
+export function getLocalStorage() {
+  let arr = JSON.parse(localStorage.getItem('bookmarks'));
+  if (Array.isArray(arr)) return;
+  state.bookmark = arr;
 }

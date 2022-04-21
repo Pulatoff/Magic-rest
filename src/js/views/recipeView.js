@@ -34,16 +34,16 @@ class RecipeView extends View {
           <span class="recipe__info-text">servings</span>
       
           <div class="recipe__info-buttons">
-            <button class="btn--tiny btn--increase-servings" id="${
+            <button class="btn--tiny btn--increase-servings" data-serv="${
               obj.servings - 1
-            }">
+            }"  id="${obj.servings - 1}">
               <svg>
                 <use href="${icons}#icon-minus-circle"></use>
               </svg>
             </button>
-            <button class="btn--tiny btn--increase-servings" id="${
+            <button class="btn--tiny btn--increase-servings" data-serv="${
               obj.servings + 1
-            }">
+            }" id="${obj.servings + 1}">
               <svg>
                 <use href="${icons}#icon-plus-circle"></use>
               </svg>
@@ -58,7 +58,9 @@ class RecipeView extends View {
         </div>
         <button class="btn--round">
           <svg class="">
-            <use href="${icons}#icon-bookmark-fill"></use>
+            <use href="${icons}#icon-bookmark${
+      obj.bookmarked ? '-fill' : ''
+    }"></use>
           </svg>
         </button>
       </div>
@@ -118,9 +120,15 @@ class RecipeView extends View {
     this._parentElement.addEventListener('click', e => {
       const btn = e.target.closest('.btn--tiny');
       if (!btn) return;
-      const servNumber = +btn.id;
-      console.log(servNumber);
+      const servNumber = +btn.dataset.serv;
       handle(servNumber);
+    });
+  }
+  addHandleEventBookmark(handle) {
+    this._parentElement.addEventListener('click', e => {
+      const btn = e.target.closest('.btn--round');
+      if (!btn) return;
+      handle();
     });
   }
 }

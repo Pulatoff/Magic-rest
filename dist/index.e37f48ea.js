@@ -525,6 +525,9 @@ var _resultsView = require("./views/resultsView");
 var _resultsViewDefault = parcelHelpers.interopDefault(_resultsView);
 var _pagination = require("./views/pagination");
 var _paginationDefault = parcelHelpers.interopDefault(_pagination);
+var _bookmarksView = require("./views/bookmarksView");
+var _bookmarksViewDefault = parcelHelpers.interopDefault(_bookmarksView);
+var _lodashEs = require("lodash-es");
 // if (module.hot) {
 //   module.hot.accept();
 // }
@@ -556,16 +559,29 @@ function paginationControler(goto) {
     _paginationDefault.default._generatorHtml(_model.state.search);
 }
 function servingsControler(num) {
+    if (num <= 0) return;
     _model.servings(num);
     _recipeViewDefault.default.render(_model.state.recipe);
 }
+function bookmarkControler() {
+    if (_model.state.recipe.bookmarked) _model.deleteBookmark(_model.state.recipe.id);
+    else _model.bookmarks(_model.state.recipe);
+    _bookmarksViewDefault.default.render(_model.state.bookmark);
+    _recipeViewDefault.default.render(_model.state.recipe);
+}
+function bookmarkLocal() {
+    _model.getLocalStorage();
+    _bookmarksViewDefault.default.render(_model.state.bookmark);
+}
+_bookmarksViewDefault.default.addhandleEvent(bookmarkLocal);
 _paginationDefault.default._addHandleClick(paginationControler);
 _recipeViewDefault.default.addHandleEvent(renderRight);
 _searchDefault.default.addHandleEvent(searchControler);
-_recipeViewDefault.default.addHandleEventServings(servingsControler); // https://forkify-api.herokuapp.com/v2
+_recipeViewDefault.default.addHandleEventServings(servingsControler);
+_recipeViewDefault.default.addHandleEventBookmark(bookmarkControler); // https://forkify-api.herokuapp.com/v2
  ///////////////////////////////////////
 
-},{"regenerator-runtime":"dXNgZ","./model":"Y4A21","./views/recipeView":"l60JC","./views/search":"kuQE5","./views/resultsView":"cSbZE","./views/pagination":"lOFRU","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dXNgZ":[function(require,module,exports) {
+},{"regenerator-runtime":"dXNgZ","./model":"Y4A21","./views/recipeView":"l60JC","./views/search":"kuQE5","./views/resultsView":"cSbZE","./views/pagination":"lOFRU","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./views/bookmarksView":"4Lqzq","lodash-es":"bXNwz"}],"dXNgZ":[function(require,module,exports) {
 /**
  * Copyright (c) 2014-present, Facebook, Inc.
  *
@@ -1144,6 +1160,12 @@ parcelHelpers.export(exports, "getSearchResultsPage", ()=>getSearchResultsPage
 );
 parcelHelpers.export(exports, "servings", ()=>servings
 );
+parcelHelpers.export(exports, "bookmarks", ()=>bookmarks
+);
+parcelHelpers.export(exports, "deleteBookmark", ()=>deleteBookmark
+);
+parcelHelpers.export(exports, "getLocalStorage", ()=>getLocalStorage
+);
 var _lodashEs = require("lodash-es");
 var _regeneratorRuntime = require("regenerator-runtime");
 var _config = require("./config");
@@ -1155,13 +1177,16 @@ const state = {
         results: [],
         page: 1,
         resultsPerPage: _config.PAGECOUNT
-    }
+    },
+    bookmark: []
 };
 async function recipeShow(id) {
     try {
         let data = await _helper.getJSON(_config.API_URL + id);
         let recipe = data.data.recipe;
         state.recipe = recipe;
+        if (state.bookmark.some((val)=>val.id === state.recipe.id
+        )) state.recipe.bookmarked = true;
     } catch (error) {
         throw error;
     }
@@ -1188,6 +1213,26 @@ function servings(peopleNumber) {
         val.quantity = val.quantity / state.recipe.servings * peopleNumber;
     });
     state.recipe.servings = peopleNumber;
+}
+function bookmarks(data) {
+    state.bookmark.push(data);
+    state.recipe.bookmarked = true;
+    saveLocalStorage();
+}
+function deleteBookmark(id) {
+    const index = state.bookmark.findIndex((val)=>val.id === id
+    );
+    state.recipe.bookmarked = false;
+    state.bookmark.splice(index, 1);
+    saveLocalStorage();
+}
+function saveLocalStorage() {
+    localStorage.setItem('bookmarks', JSON.stringify(state.bookmark));
+}
+function getLocalStorage() {
+    let arr = JSON.parse(localStorage.getItem('bookmarks'));
+    if (Array.isArray(arr)) return;
+    state.bookmark = arr;
 }
 
 },{"lodash-es":"bXNwz","regenerator-runtime":"dXNgZ","./config":"k5Hzs","./helper":"lVRAz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bXNwz":[function(require,module,exports) {
@@ -2480,7 +2525,7 @@ var _zipWithJsDefault = parcelHelpers.interopDefault(_zipWithJs);
 var _lodashDefaultJs = require("./lodash.default.js");
 var _lodashDefaultJsDefault = parcelHelpers.interopDefault(_lodashDefaultJs);
 
-},{"./add.js":false,"./after.js":false,"./ary.js":false,"./assign.js":false,"./assignIn.js":"139G9","./assignInWith.js":false,"./assignWith.js":false,"./at.js":false,"./attempt.js":false,"./before.js":false,"./bind.js":false,"./bindAll.js":false,"./bindKey.js":false,"./camelCase.js":false,"./capitalize.js":false,"./castArray.js":false,"./ceil.js":false,"./chain.js":false,"./chunk.js":false,"./clamp.js":false,"./clone.js":false,"./cloneDeep.js":false,"./cloneDeepWith.js":false,"./cloneWith.js":false,"./commit.js":false,"./compact.js":false,"./concat.js":false,"./cond.js":false,"./conforms.js":false,"./conformsTo.js":false,"./constant.js":"a5s7V","./countBy.js":false,"./create.js":false,"./curry.js":false,"./curryRight.js":false,"./debounce.js":false,"./deburr.js":false,"./defaultTo.js":false,"./defaults.js":false,"./defaultsDeep.js":false,"./defer.js":false,"./delay.js":false,"./difference.js":false,"./differenceBy.js":false,"./differenceWith.js":false,"./divide.js":false,"./drop.js":false,"./dropRight.js":false,"./dropRightWhile.js":false,"./dropWhile.js":false,"./each.js":false,"./eachRight.js":false,"./endsWith.js":false,"./entries.js":false,"./entriesIn.js":false,"./eq.js":"7el3s","./escape.js":false,"./escapeRegExp.js":false,"./every.js":false,"./extend.js":"cUkOZ","./extendWith.js":false,"./fill.js":false,"./filter.js":false,"./find.js":false,"./findIndex.js":false,"./findKey.js":false,"./findLast.js":false,"./findLastIndex.js":false,"./findLastKey.js":false,"./first.js":false,"./flatMap.js":false,"./flatMapDeep.js":false,"./flatMapDepth.js":false,"./flatten.js":false,"./flattenDeep.js":false,"./flattenDepth.js":false,"./flip.js":false,"./floor.js":false,"./flow.js":false,"./flowRight.js":false,"./forEach.js":false,"./forEachRight.js":false,"./forIn.js":false,"./forInRight.js":false,"./forOwn.js":false,"./forOwnRight.js":false,"./fromPairs.js":false,"./functions.js":false,"./functionsIn.js":false,"./get.js":false,"./groupBy.js":false,"./gt.js":false,"./gte.js":false,"./has.js":false,"./hasIn.js":false,"./head.js":false,"./identity.js":"1Y0KA","./inRange.js":false,"./includes.js":false,"./indexOf.js":false,"./initial.js":false,"./intersection.js":false,"./intersectionBy.js":false,"./intersectionWith.js":false,"./invert.js":false,"./invertBy.js":false,"./invoke.js":false,"./invokeMap.js":false,"./isArguments.js":"9k91Y","./isArray.js":"ETPQ1","./isArrayBuffer.js":false,"./isArrayLike.js":"8SdiO","./isArrayLikeObject.js":false,"./isBoolean.js":false,"./isBuffer.js":"llpEE","./isDate.js":false,"./isElement.js":false,"./isEmpty.js":false,"./isEqual.js":false,"./isEqualWith.js":false,"./isError.js":false,"./isFinite.js":false,"./isFunction.js":"e5kis","./isInteger.js":false,"./isLength.js":"bItM0","./isMap.js":false,"./isMatch.js":false,"./isMatchWith.js":false,"./isNaN.js":false,"./isNative.js":false,"./isNil.js":false,"./isNull.js":false,"./isNumber.js":false,"./isObject.js":"dHhyW","./isObjectLike.js":"iad76","./isPlainObject.js":false,"./isRegExp.js":false,"./isSafeInteger.js":false,"./isSet.js":false,"./isString.js":false,"./isSymbol.js":"gCyRJ","./isTypedArray.js":"2LIMs","./isUndefined.js":false,"./isWeakMap.js":false,"./isWeakSet.js":false,"./iteratee.js":false,"./join.js":false,"./kebabCase.js":false,"./keyBy.js":false,"./keys.js":false,"./keysIn.js":"jms5f","./last.js":false,"./lastIndexOf.js":false,"./wrapperLodash.js":false,"./lowerCase.js":false,"./lowerFirst.js":false,"./lt.js":false,"./lte.js":false,"./map.js":false,"./mapKeys.js":false,"./mapValues.js":false,"./matches.js":false,"./matchesProperty.js":false,"./max.js":false,"./maxBy.js":false,"./mean.js":false,"./meanBy.js":false,"./memoize.js":false,"./merge.js":false,"./mergeWith.js":false,"./method.js":false,"./methodOf.js":false,"./min.js":false,"./minBy.js":false,"./mixin.js":false,"./multiply.js":false,"./negate.js":false,"./next.js":false,"./noop.js":false,"./now.js":false,"./nth.js":false,"./nthArg.js":false,"./omit.js":false,"./omitBy.js":false,"./once.js":false,"./orderBy.js":false,"./over.js":false,"./overArgs.js":false,"./overEvery.js":false,"./overSome.js":false,"./pad.js":"hWnaV","./padEnd.js":false,"./padStart.js":false,"./parseInt.js":false,"./partial.js":false,"./partialRight.js":false,"./partition.js":false,"./pick.js":false,"./pickBy.js":false,"./plant.js":false,"./property.js":false,"./propertyOf.js":false,"./pull.js":false,"./pullAll.js":false,"./pullAllBy.js":false,"./pullAllWith.js":false,"./pullAt.js":false,"./random.js":false,"./range.js":false,"./rangeRight.js":false,"./rearg.js":false,"./reduce.js":false,"./reduceRight.js":false,"./reject.js":false,"./remove.js":false,"./repeat.js":false,"./replace.js":false,"./rest.js":false,"./result.js":false,"./reverse.js":false,"./round.js":false,"./sample.js":false,"./sampleSize.js":false,"./set.js":false,"./setWith.js":false,"./shuffle.js":false,"./size.js":false,"./slice.js":false,"./snakeCase.js":false,"./some.js":false,"./sortBy.js":false,"./sortedIndex.js":false,"./sortedIndexBy.js":false,"./sortedIndexOf.js":false,"./sortedLastIndex.js":false,"./sortedLastIndexBy.js":false,"./sortedLastIndexOf.js":false,"./sortedUniq.js":false,"./sortedUniqBy.js":false,"./split.js":false,"./spread.js":false,"./startCase.js":false,"./startsWith.js":false,"./stubArray.js":false,"./stubFalse.js":"fF5mf","./stubObject.js":false,"./stubString.js":false,"./stubTrue.js":false,"./subtract.js":false,"./sum.js":false,"./sumBy.js":false,"./tail.js":false,"./take.js":false,"./takeRight.js":false,"./takeRightWhile.js":false,"./takeWhile.js":false,"./tap.js":false,"./template.js":false,"./templateSettings.js":false,"./throttle.js":false,"./thru.js":false,"./times.js":false,"./toArray.js":false,"./toFinite.js":"FJR8i","./toInteger.js":"1tdUD","./toIterator.js":false,"./toJSON.js":false,"./toLength.js":false,"./toLower.js":false,"./toNumber.js":"4CrK2","./toPairs.js":false,"./toPairsIn.js":false,"./toPath.js":false,"./toPlainObject.js":false,"./toSafeInteger.js":false,"./toString.js":"hF0LJ","./toUpper.js":false,"./transform.js":false,"./trim.js":false,"./trimEnd.js":false,"./trimStart.js":false,"./truncate.js":false,"./unary.js":false,"./unescape.js":false,"./union.js":false,"./unionBy.js":false,"./unionWith.js":false,"./uniq.js":false,"./uniqBy.js":false,"./uniqWith.js":false,"./uniqueId.js":false,"./unset.js":false,"./unzip.js":false,"./unzipWith.js":false,"./update.js":false,"./updateWith.js":false,"./upperCase.js":false,"./upperFirst.js":false,"./value.js":false,"./valueOf.js":false,"./values.js":false,"./valuesIn.js":false,"./without.js":false,"./words.js":false,"./wrap.js":false,"./wrapperAt.js":false,"./wrapperChain.js":false,"./wrapperReverse.js":false,"./wrapperValue.js":false,"./xor.js":false,"./xorBy.js":false,"./xorWith.js":false,"./zip.js":false,"./zipObject.js":false,"./zipObjectDeep.js":false,"./zipWith.js":false,"./lodash.default.js":false,"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"139G9":[function(require,module,exports) {
+},{"./add.js":false,"./after.js":false,"./ary.js":false,"./assign.js":false,"./assignIn.js":"139G9","./assignInWith.js":false,"./assignWith.js":false,"./at.js":false,"./attempt.js":false,"./before.js":false,"./bind.js":false,"./bindAll.js":false,"./bindKey.js":false,"./camelCase.js":false,"./capitalize.js":false,"./castArray.js":false,"./ceil.js":false,"./chain.js":false,"./chunk.js":false,"./clamp.js":false,"./clone.js":false,"./cloneDeep.js":false,"./cloneDeepWith.js":false,"./cloneWith.js":false,"./commit.js":false,"./compact.js":false,"./concat.js":false,"./cond.js":false,"./conforms.js":false,"./conformsTo.js":false,"./constant.js":"a5s7V","./countBy.js":false,"./create.js":false,"./curry.js":false,"./curryRight.js":false,"./debounce.js":"g26I7","./deburr.js":false,"./defaultTo.js":false,"./defaults.js":false,"./defaultsDeep.js":false,"./defer.js":false,"./delay.js":false,"./difference.js":false,"./differenceBy.js":false,"./differenceWith.js":false,"./divide.js":false,"./drop.js":false,"./dropRight.js":false,"./dropRightWhile.js":false,"./dropWhile.js":false,"./each.js":false,"./eachRight.js":false,"./endsWith.js":false,"./entries.js":false,"./entriesIn.js":false,"./eq.js":"7el3s","./escape.js":false,"./escapeRegExp.js":false,"./every.js":false,"./extend.js":"cUkOZ","./extendWith.js":false,"./fill.js":false,"./filter.js":false,"./find.js":false,"./findIndex.js":false,"./findKey.js":false,"./findLast.js":false,"./findLastIndex.js":false,"./findLastKey.js":false,"./first.js":false,"./flatMap.js":false,"./flatMapDeep.js":false,"./flatMapDepth.js":false,"./flatten.js":false,"./flattenDeep.js":false,"./flattenDepth.js":false,"./flip.js":false,"./floor.js":false,"./flow.js":false,"./flowRight.js":false,"./forEach.js":false,"./forEachRight.js":false,"./forIn.js":false,"./forInRight.js":false,"./forOwn.js":false,"./forOwnRight.js":false,"./fromPairs.js":false,"./functions.js":false,"./functionsIn.js":false,"./get.js":false,"./groupBy.js":false,"./gt.js":false,"./gte.js":false,"./has.js":false,"./hasIn.js":false,"./head.js":false,"./identity.js":"1Y0KA","./inRange.js":false,"./includes.js":false,"./indexOf.js":false,"./initial.js":false,"./intersection.js":false,"./intersectionBy.js":false,"./intersectionWith.js":false,"./invert.js":false,"./invertBy.js":false,"./invoke.js":false,"./invokeMap.js":false,"./isArguments.js":"9k91Y","./isArray.js":"ETPQ1","./isArrayBuffer.js":false,"./isArrayLike.js":"8SdiO","./isArrayLikeObject.js":false,"./isBoolean.js":false,"./isBuffer.js":"llpEE","./isDate.js":false,"./isElement.js":false,"./isEmpty.js":false,"./isEqual.js":false,"./isEqualWith.js":false,"./isError.js":false,"./isFinite.js":false,"./isFunction.js":"e5kis","./isInteger.js":false,"./isLength.js":"bItM0","./isMap.js":false,"./isMatch.js":false,"./isMatchWith.js":false,"./isNaN.js":false,"./isNative.js":false,"./isNil.js":false,"./isNull.js":false,"./isNumber.js":false,"./isObject.js":"dHhyW","./isObjectLike.js":"iad76","./isPlainObject.js":false,"./isRegExp.js":false,"./isSafeInteger.js":false,"./isSet.js":false,"./isString.js":false,"./isSymbol.js":"gCyRJ","./isTypedArray.js":"2LIMs","./isUndefined.js":false,"./isWeakMap.js":false,"./isWeakSet.js":false,"./iteratee.js":false,"./join.js":false,"./kebabCase.js":false,"./keyBy.js":false,"./keys.js":false,"./keysIn.js":"jms5f","./last.js":false,"./lastIndexOf.js":false,"./wrapperLodash.js":false,"./lowerCase.js":false,"./lowerFirst.js":false,"./lt.js":false,"./lte.js":false,"./map.js":false,"./mapKeys.js":false,"./mapValues.js":false,"./matches.js":false,"./matchesProperty.js":false,"./max.js":false,"./maxBy.js":false,"./mean.js":false,"./meanBy.js":false,"./memoize.js":false,"./merge.js":false,"./mergeWith.js":false,"./method.js":false,"./methodOf.js":false,"./min.js":false,"./minBy.js":false,"./mixin.js":false,"./multiply.js":false,"./negate.js":false,"./next.js":false,"./noop.js":false,"./now.js":"exZwe","./nth.js":false,"./nthArg.js":false,"./omit.js":false,"./omitBy.js":false,"./once.js":false,"./orderBy.js":false,"./over.js":false,"./overArgs.js":false,"./overEvery.js":false,"./overSome.js":false,"./pad.js":"hWnaV","./padEnd.js":false,"./padStart.js":false,"./parseInt.js":false,"./partial.js":false,"./partialRight.js":false,"./partition.js":false,"./pick.js":false,"./pickBy.js":false,"./plant.js":false,"./property.js":false,"./propertyOf.js":false,"./pull.js":false,"./pullAll.js":false,"./pullAllBy.js":false,"./pullAllWith.js":false,"./pullAt.js":false,"./random.js":false,"./range.js":false,"./rangeRight.js":false,"./rearg.js":false,"./reduce.js":false,"./reduceRight.js":false,"./reject.js":false,"./remove.js":false,"./repeat.js":false,"./replace.js":false,"./rest.js":false,"./result.js":false,"./reverse.js":false,"./round.js":false,"./sample.js":false,"./sampleSize.js":false,"./set.js":false,"./setWith.js":false,"./shuffle.js":false,"./size.js":false,"./slice.js":false,"./snakeCase.js":false,"./some.js":false,"./sortBy.js":false,"./sortedIndex.js":false,"./sortedIndexBy.js":false,"./sortedIndexOf.js":false,"./sortedLastIndex.js":false,"./sortedLastIndexBy.js":false,"./sortedLastIndexOf.js":false,"./sortedUniq.js":false,"./sortedUniqBy.js":false,"./split.js":false,"./spread.js":false,"./startCase.js":false,"./startsWith.js":false,"./stubArray.js":false,"./stubFalse.js":"fF5mf","./stubObject.js":false,"./stubString.js":false,"./stubTrue.js":false,"./subtract.js":false,"./sum.js":false,"./sumBy.js":false,"./tail.js":false,"./take.js":false,"./takeRight.js":false,"./takeRightWhile.js":false,"./takeWhile.js":false,"./tap.js":false,"./template.js":false,"./templateSettings.js":false,"./throttle.js":false,"./thru.js":false,"./times.js":false,"./toArray.js":false,"./toFinite.js":"FJR8i","./toInteger.js":"1tdUD","./toIterator.js":false,"./toJSON.js":false,"./toLength.js":false,"./toLower.js":false,"./toNumber.js":"4CrK2","./toPairs.js":false,"./toPairsIn.js":false,"./toPath.js":false,"./toPlainObject.js":false,"./toSafeInteger.js":false,"./toString.js":"hF0LJ","./toUpper.js":false,"./transform.js":false,"./trim.js":false,"./trimEnd.js":false,"./trimStart.js":false,"./truncate.js":false,"./unary.js":false,"./unescape.js":false,"./union.js":false,"./unionBy.js":false,"./unionWith.js":false,"./uniq.js":false,"./uniqBy.js":false,"./uniqWith.js":false,"./uniqueId.js":false,"./unset.js":false,"./unzip.js":false,"./unzipWith.js":false,"./update.js":false,"./updateWith.js":false,"./upperCase.js":false,"./upperFirst.js":false,"./value.js":false,"./valueOf.js":false,"./values.js":false,"./valuesIn.js":false,"./without.js":false,"./words.js":false,"./wrap.js":false,"./wrapperAt.js":false,"./wrapperChain.js":false,"./wrapperReverse.js":false,"./wrapperValue.js":false,"./xor.js":false,"./xorBy.js":false,"./xorWith.js":false,"./zip.js":false,"./zipObject.js":false,"./zipObjectDeep.js":false,"./zipWith.js":false,"./lodash.default.js":false,"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"139G9":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _copyObjectJs = require("./_copyObject.js");
@@ -3717,15 +3762,262 @@ parcelHelpers.defineInteropFlag(exports);
 }
 exports.default = nativeKeysIn;
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"cUkOZ":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"g26I7":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "default", ()=>_assignInJsDefault.default
-);
-var _assignInJs = require("./assignIn.js");
-var _assignInJsDefault = parcelHelpers.interopDefault(_assignInJs);
+var _isObjectJs = require("./isObject.js");
+var _isObjectJsDefault = parcelHelpers.interopDefault(_isObjectJs);
+var _nowJs = require("./now.js");
+var _nowJsDefault = parcelHelpers.interopDefault(_nowJs);
+var _toNumberJs = require("./toNumber.js");
+var _toNumberJsDefault = parcelHelpers.interopDefault(_toNumberJs);
+/** Error message constants. */ var FUNC_ERROR_TEXT = 'Expected a function';
+/* Built-in method references for those with the same name as other `lodash` methods. */ var nativeMax = Math.max, nativeMin = Math.min;
+/**
+ * Creates a debounced function that delays invoking `func` until after `wait`
+ * milliseconds have elapsed since the last time the debounced function was
+ * invoked. The debounced function comes with a `cancel` method to cancel
+ * delayed `func` invocations and a `flush` method to immediately invoke them.
+ * Provide `options` to indicate whether `func` should be invoked on the
+ * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
+ * with the last arguments provided to the debounced function. Subsequent
+ * calls to the debounced function return the result of the last `func`
+ * invocation.
+ *
+ * **Note:** If `leading` and `trailing` options are `true`, `func` is
+ * invoked on the trailing edge of the timeout only if the debounced function
+ * is invoked more than once during the `wait` timeout.
+ *
+ * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+ * until to the next tick, similar to `setTimeout` with a timeout of `0`.
+ *
+ * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
+ * for details over the differences between `_.debounce` and `_.throttle`.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Function
+ * @param {Function} func The function to debounce.
+ * @param {number} [wait=0] The number of milliseconds to delay.
+ * @param {Object} [options={}] The options object.
+ * @param {boolean} [options.leading=false]
+ *  Specify invoking on the leading edge of the timeout.
+ * @param {number} [options.maxWait]
+ *  The maximum time `func` is allowed to be delayed before it's invoked.
+ * @param {boolean} [options.trailing=true]
+ *  Specify invoking on the trailing edge of the timeout.
+ * @returns {Function} Returns the new debounced function.
+ * @example
+ *
+ * // Avoid costly calculations while the window size is in flux.
+ * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
+ *
+ * // Invoke `sendMail` when clicked, debouncing subsequent calls.
+ * jQuery(element).on('click', _.debounce(sendMail, 300, {
+ *   'leading': true,
+ *   'trailing': false
+ * }));
+ *
+ * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
+ * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
+ * var source = new EventSource('/stream');
+ * jQuery(source).on('message', debounced);
+ *
+ * // Cancel the trailing debounced invocation.
+ * jQuery(window).on('popstate', debounced.cancel);
+ */ function debounce(func, wait, options) {
+    var lastArgs, lastThis, maxWait, result, timerId, lastCallTime, lastInvokeTime = 0, leading = false, maxing = false, trailing = true;
+    if (typeof func != 'function') throw new TypeError(FUNC_ERROR_TEXT);
+    wait = _toNumberJsDefault.default(wait) || 0;
+    if (_isObjectJsDefault.default(options)) {
+        leading = !!options.leading;
+        maxing = 'maxWait' in options;
+        maxWait = maxing ? nativeMax(_toNumberJsDefault.default(options.maxWait) || 0, wait) : maxWait;
+        trailing = 'trailing' in options ? !!options.trailing : trailing;
+    }
+    function invokeFunc(time) {
+        var args = lastArgs, thisArg = lastThis;
+        lastArgs = lastThis = undefined;
+        lastInvokeTime = time;
+        result = func.apply(thisArg, args);
+        return result;
+    }
+    function leadingEdge(time) {
+        // Reset any `maxWait` timer.
+        lastInvokeTime = time;
+        // Start the timer for the trailing edge.
+        timerId = setTimeout(timerExpired, wait);
+        // Invoke the leading edge.
+        return leading ? invokeFunc(time) : result;
+    }
+    function remainingWait(time) {
+        var timeSinceLastCall = time - lastCallTime, timeSinceLastInvoke = time - lastInvokeTime, timeWaiting = wait - timeSinceLastCall;
+        return maxing ? nativeMin(timeWaiting, maxWait - timeSinceLastInvoke) : timeWaiting;
+    }
+    function shouldInvoke(time) {
+        var timeSinceLastCall = time - lastCallTime, timeSinceLastInvoke = time - lastInvokeTime;
+        // Either this is the first call, activity has stopped and we're at the
+        // trailing edge, the system time has gone backwards and we're treating
+        // it as the trailing edge, or we've hit the `maxWait` limit.
+        return lastCallTime === undefined || timeSinceLastCall >= wait || timeSinceLastCall < 0 || maxing && timeSinceLastInvoke >= maxWait;
+    }
+    function timerExpired() {
+        var time = _nowJsDefault.default();
+        if (shouldInvoke(time)) return trailingEdge(time);
+        // Restart the timer.
+        timerId = setTimeout(timerExpired, remainingWait(time));
+    }
+    function trailingEdge(time) {
+        timerId = undefined;
+        // Only invoke if we have `lastArgs` which means `func` has been
+        // debounced at least once.
+        if (trailing && lastArgs) return invokeFunc(time);
+        lastArgs = lastThis = undefined;
+        return result;
+    }
+    function cancel() {
+        if (timerId !== undefined) clearTimeout(timerId);
+        lastInvokeTime = 0;
+        lastArgs = lastCallTime = lastThis = timerId = undefined;
+    }
+    function flush() {
+        return timerId === undefined ? result : trailingEdge(_nowJsDefault.default());
+    }
+    function debounced() {
+        var time = _nowJsDefault.default(), isInvoking = shouldInvoke(time);
+        lastArgs = arguments;
+        lastThis = this;
+        lastCallTime = time;
+        if (isInvoking) {
+            if (timerId === undefined) return leadingEdge(lastCallTime);
+            if (maxing) {
+                // Handle invocations in a tight loop.
+                clearTimeout(timerId);
+                timerId = setTimeout(timerExpired, wait);
+                return invokeFunc(lastCallTime);
+            }
+        }
+        if (timerId === undefined) timerId = setTimeout(timerExpired, wait);
+        return result;
+    }
+    debounced.cancel = cancel;
+    debounced.flush = flush;
+    return debounced;
+}
+exports.default = debounce;
 
-},{"./assignIn.js":"139G9","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gCyRJ":[function(require,module,exports) {
+},{"./isObject.js":"dHhyW","./now.js":"exZwe","./toNumber.js":"4CrK2","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"exZwe":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _rootJs = require("./_root.js");
+var _rootJsDefault = parcelHelpers.interopDefault(_rootJs);
+/**
+ * Gets the timestamp of the number of milliseconds that have elapsed since
+ * the Unix epoch (1 January 1970 00:00:00 UTC).
+ *
+ * @static
+ * @memberOf _
+ * @since 2.4.0
+ * @category Date
+ * @returns {number} Returns the timestamp.
+ * @example
+ *
+ * _.defer(function(stamp) {
+ *   console.log(_.now() - stamp);
+ * }, _.now());
+ * // => Logs the number of milliseconds it took for the deferred invocation.
+ */ var now = function() {
+    return _rootJsDefault.default.Date.now();
+};
+exports.default = now;
+
+},{"./_root.js":"8yvCA","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4CrK2":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _baseTrimJs = require("./_baseTrim.js");
+var _baseTrimJsDefault = parcelHelpers.interopDefault(_baseTrimJs);
+var _isObjectJs = require("./isObject.js");
+var _isObjectJsDefault = parcelHelpers.interopDefault(_isObjectJs);
+var _isSymbolJs = require("./isSymbol.js");
+var _isSymbolJsDefault = parcelHelpers.interopDefault(_isSymbolJs);
+/** Used as references for various `Number` constants. */ var NAN = 0 / 0;
+/** Used to detect bad signed hexadecimal string values. */ var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+/** Used to detect binary string values. */ var reIsBinary = /^0b[01]+$/i;
+/** Used to detect octal string values. */ var reIsOctal = /^0o[0-7]+$/i;
+/** Built-in method references without a dependency on `root`. */ var freeParseInt = parseInt;
+/**
+ * Converts `value` to a number.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to process.
+ * @returns {number} Returns the number.
+ * @example
+ *
+ * _.toNumber(3.2);
+ * // => 3.2
+ *
+ * _.toNumber(Number.MIN_VALUE);
+ * // => 5e-324
+ *
+ * _.toNumber(Infinity);
+ * // => Infinity
+ *
+ * _.toNumber('3.2');
+ * // => 3.2
+ */ function toNumber(value) {
+    if (typeof value == 'number') return value;
+    if (_isSymbolJsDefault.default(value)) return NAN;
+    if (_isObjectJsDefault.default(value)) {
+        var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
+        value = _isObjectJsDefault.default(other) ? other + '' : other;
+    }
+    if (typeof value != 'string') return value === 0 ? value : +value;
+    value = _baseTrimJsDefault.default(value);
+    var isBinary = reIsBinary.test(value);
+    return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
+}
+exports.default = toNumber;
+
+},{"./_baseTrim.js":"4X9xl","./isObject.js":"dHhyW","./isSymbol.js":"gCyRJ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4X9xl":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _trimmedEndIndexJs = require("./_trimmedEndIndex.js");
+var _trimmedEndIndexJsDefault = parcelHelpers.interopDefault(_trimmedEndIndexJs);
+/** Used to match leading whitespace. */ var reTrimStart = /^\s+/;
+/**
+ * The base implementation of `_.trim`.
+ *
+ * @private
+ * @param {string} string The string to trim.
+ * @returns {string} Returns the trimmed string.
+ */ function baseTrim(string) {
+    return string ? string.slice(0, _trimmedEndIndexJsDefault.default(string) + 1).replace(reTrimStart, '') : string;
+}
+exports.default = baseTrim;
+
+},{"./_trimmedEndIndex.js":"lXShQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lXShQ":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+/** Used to match a single whitespace character. */ var reWhitespace = /\s/;
+/**
+ * Used by `_.trim` and `_.trimEnd` to get the index of the last non-whitespace
+ * character of `string`.
+ *
+ * @private
+ * @param {string} string The string to inspect.
+ * @returns {number} Returns the index of the last non-whitespace character.
+ */ function trimmedEndIndex(string) {
+    var index = string.length;
+    while(index-- && reWhitespace.test(string.charAt(index)));
+    return index;
+}
+exports.default = trimmedEndIndex;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gCyRJ":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _baseGetTagJs = require("./_baseGetTag.js");
@@ -3754,7 +4046,15 @@ var _isObjectLikeJsDefault = parcelHelpers.interopDefault(_isObjectLikeJs);
 }
 exports.default = isSymbol;
 
-},{"./_baseGetTag.js":"gVDfP","./isObjectLike.js":"iad76","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"hWnaV":[function(require,module,exports) {
+},{"./_baseGetTag.js":"gVDfP","./isObjectLike.js":"iad76","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"cUkOZ":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "default", ()=>_assignInJsDefault.default
+);
+var _assignInJs = require("./assignIn.js");
+var _assignInJsDefault = parcelHelpers.interopDefault(_assignInJs);
+
+},{"./assignIn.js":"139G9","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"hWnaV":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _createPaddingJs = require("./_createPadding.js");
@@ -4184,92 +4484,7 @@ var _toNumberJsDefault = parcelHelpers.interopDefault(_toNumberJs);
 }
 exports.default = toFinite;
 
-},{"./toNumber.js":"4CrK2","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4CrK2":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _baseTrimJs = require("./_baseTrim.js");
-var _baseTrimJsDefault = parcelHelpers.interopDefault(_baseTrimJs);
-var _isObjectJs = require("./isObject.js");
-var _isObjectJsDefault = parcelHelpers.interopDefault(_isObjectJs);
-var _isSymbolJs = require("./isSymbol.js");
-var _isSymbolJsDefault = parcelHelpers.interopDefault(_isSymbolJs);
-/** Used as references for various `Number` constants. */ var NAN = 0 / 0;
-/** Used to detect bad signed hexadecimal string values. */ var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
-/** Used to detect binary string values. */ var reIsBinary = /^0b[01]+$/i;
-/** Used to detect octal string values. */ var reIsOctal = /^0o[0-7]+$/i;
-/** Built-in method references without a dependency on `root`. */ var freeParseInt = parseInt;
-/**
- * Converts `value` to a number.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to process.
- * @returns {number} Returns the number.
- * @example
- *
- * _.toNumber(3.2);
- * // => 3.2
- *
- * _.toNumber(Number.MIN_VALUE);
- * // => 5e-324
- *
- * _.toNumber(Infinity);
- * // => Infinity
- *
- * _.toNumber('3.2');
- * // => 3.2
- */ function toNumber(value) {
-    if (typeof value == 'number') return value;
-    if (_isSymbolJsDefault.default(value)) return NAN;
-    if (_isObjectJsDefault.default(value)) {
-        var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
-        value = _isObjectJsDefault.default(other) ? other + '' : other;
-    }
-    if (typeof value != 'string') return value === 0 ? value : +value;
-    value = _baseTrimJsDefault.default(value);
-    var isBinary = reIsBinary.test(value);
-    return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
-}
-exports.default = toNumber;
-
-},{"./_baseTrim.js":"4X9xl","./isObject.js":"dHhyW","./isSymbol.js":"gCyRJ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4X9xl":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _trimmedEndIndexJs = require("./_trimmedEndIndex.js");
-var _trimmedEndIndexJsDefault = parcelHelpers.interopDefault(_trimmedEndIndexJs);
-/** Used to match leading whitespace. */ var reTrimStart = /^\s+/;
-/**
- * The base implementation of `_.trim`.
- *
- * @private
- * @param {string} string The string to trim.
- * @returns {string} Returns the trimmed string.
- */ function baseTrim(string) {
-    return string ? string.slice(0, _trimmedEndIndexJsDefault.default(string) + 1).replace(reTrimStart, '') : string;
-}
-exports.default = baseTrim;
-
-},{"./_trimmedEndIndex.js":"lXShQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lXShQ":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-/** Used to match a single whitespace character. */ var reWhitespace = /\s/;
-/**
- * Used by `_.trim` and `_.trimEnd` to get the index of the last non-whitespace
- * character of `string`.
- *
- * @private
- * @param {string} string The string to inspect.
- * @returns {number} Returns the index of the last non-whitespace character.
- */ function trimmedEndIndex(string) {
-    var index = string.length;
-    while(index-- && reWhitespace.test(string.charAt(index)));
-    return index;
-}
-exports.default = trimmedEndIndex;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"hF0LJ":[function(require,module,exports) {
+},{"./toNumber.js":"4CrK2","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"hF0LJ":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _baseToStringJs = require("./_baseToString.js");
@@ -4371,12 +4586,12 @@ class RecipeView extends _viewDefault.default {
           <span class="recipe__info-text">servings</span>
       
           <div class="recipe__info-buttons">
-            <button class="btn--tiny btn--increase-servings" id="${obj.servings - 1}">
+            <button class="btn--tiny btn--increase-servings" data-serv="${obj.servings - 1}"  id="${obj.servings - 1}">
               <svg>
                 <use href="${_iconsSvgDefault.default}#icon-minus-circle"></use>
               </svg>
             </button>
-            <button class="btn--tiny btn--increase-servings" id="${obj.servings + 1}">
+            <button class="btn--tiny btn--increase-servings" data-serv="${obj.servings + 1}" id="${obj.servings + 1}">
               <svg>
                 <use href="${_iconsSvgDefault.default}#icon-plus-circle"></use>
               </svg>
@@ -4391,7 +4606,7 @@ class RecipeView extends _viewDefault.default {
         </div>
         <button class="btn--round">
           <svg class="">
-            <use href="${_iconsSvgDefault.default}#icon-bookmark-fill"></use>
+            <use href="${_iconsSvgDefault.default}#icon-bookmark${obj.bookmarked ? '-fill' : ''}"></use>
           </svg>
         </button>
       </div>
@@ -4449,9 +4664,15 @@ class RecipeView extends _viewDefault.default {
         this._parentElement.addEventListener('click', (e)=>{
             const btn = e.target.closest('.btn--tiny');
             if (!btn) return;
-            const servNumber = +btn.id;
-            console.log(servNumber);
+            const servNumber = +btn.dataset.serv;
             handle(servNumber);
+        });
+    }
+    addHandleEventBookmark(handle) {
+        this._parentElement.addEventListener('click', (e)=>{
+            const btn = e.target.closest('.btn--round');
+            if (!btn) return;
+            handle();
         });
     }
 }
@@ -4658,6 +4879,47 @@ class Pagination extends _viewDefault.default {
     }
 }
 exports.default = new Pagination();
+
+},{"./View":"5cUXS","../../img/icons.svg":"cMpiy","lodash-es":"bXNwz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4Lqzq":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _view = require("./View");
+var _viewDefault = parcelHelpers.interopDefault(_view);
+var _iconsSvg = require("../../img/icons.svg");
+var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
+var _lodashEs = require("lodash-es");
+class BookMarksView extends _viewDefault.default {
+    _parentElement = document.querySelector('.bookmarks__list');
+    _errorMessage = 'Recipe not founded. Please try again!';
+    _generatorHtml(data) {
+        console.log(data);
+        data.forEach((element)=>{
+            this._parentElement.insertAdjacentHTML('afterbegin', this._generatorHtmlResult(element));
+        });
+    }
+    _generatorHtmlResult(data) {
+        return `
+    <li class="preview">
+    <a class="preview__link" href="#${data.id}">
+      <figure class="preview__fig">
+        <img src="${data.image_url}" alt="Test" />
+      </figure>
+      <div class="preview__data">
+        <h4 class="preview__name">
+         ${data.title}
+        </h4>
+        <p class="preview__publisher">${data.publisher}</p>
+      </div>
+    </a>
+  </li>`;
+    }
+    addhandleEvent(handle) {
+        window.addEventListener('load', function() {
+            handle();
+        });
+    }
+}
+exports.default = new BookMarksView();
 
 },{"./View":"5cUXS","../../img/icons.svg":"cMpiy","lodash-es":"bXNwz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["ddCAb","aenu9"], "aenu9", "parcelRequire7e89")
 
